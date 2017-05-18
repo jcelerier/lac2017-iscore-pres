@@ -1,9 +1,12 @@
 \documentclass[handout]{beamer}
 \usepackage{fontspec}
+\usetheme{simple}
+\setbeamertemplate{footline}{}
 % \usepackage{polyglossia}
 \usepackage{listings}
 %\setmainfont{Noto Sans}
 %\setsansfont{Noto Sans}
+\setmonofont{Fira Code}
 \author{Jean-Michaël Celerier}
 \title{i-score: an overview}
 \subtitle{Linux Audio Conference - Workshop}
@@ -19,8 +22,41 @@
 \end{frame}
 
 \section{Context}
-\Large
+
 \begin{frame}
+\centering
+\Huge Les Baltazars - Tumbleweed
+\end{frame}
+
+\begin{frame}
+\centering
+\vspace{-1mm}
+
+\includegraphics[width=0.8\textwidth]{images/tumbleweed.jpg}
+\end{frame}
+
+\begin{frame}
+\centering
+\Huge Pierre Cochard - Quarrè
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\textwidth]{images/quarre.jpg}
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\textwidth]{images/quarre-2.jpg}
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\textwidth]{images/quarre-3.jpg}
+\end{frame}
+
+\begin{frame}
+\Large
 \begin{itemize}
     \item Digital arts: music, video, transmedia, etc...
     \item Temporal structure \& interactivity.
@@ -29,20 +65,9 @@
 \end{frame}
 
 \begin{frame}
-Nebula
+\includegraphics[width=\textwidth]{images/jamoma.jpg}
 \end{frame}
 
-\begin{frame}
-Scénario Pachoud
-\end{frame}
-
-\begin{frame}
-Bosch
-\end{frame}
-
-\begin{frame}
-Quarrè
-\end{frame}
 
 
 \section{Foundation: libossia}
@@ -52,10 +77,9 @@ Quarrè
 \frametitle{libossia: goals}
 \Large
 \begin{itemize}
-    \item Automatic discovery
-    \item Shared object model
-    \item Bare metal ? IncludeOS.
-    \item Scoring primitives
+    \item Automatic discovery.
+    \item Shared object model inspired from OSC.
+    \item Scoring primitives.
 \end{itemize}
 \end{frame}
 
@@ -79,20 +103,49 @@ To come: ArtNet (DMX)
 \begin{frame}
 \frametitle{Standard protocols}
 \Large
+
+\includegraphics[width=\textwidth]{images/tree.png}
 \end{frame}
 
 
-\begin{frame}
-\frametitle{Qt protocols}
+\begin{frame}[fragile]
+\frametitle{Qt-based protocols}
 \Large
+When no tree structure easily makes sense,~\\let the user script it !
+\footnotesize
+\begin{lstlisting}
+function onMessage(message) {
+    console.log(message);
+    var res = JSON.parse(message);
+    console.log(res.value);
+    if(res.name === "toto")
+    {
+        return [ { address: "/toto", value: res.value } ];
+    }
+    return { };
+}
+
+function createTree() {
+    return [ {
+                name: "tata",
+                children: [
+                    {
+                        name: "tutu",
+                        request: "{ \"name\": \"toto\", \"value\": $val }",
+                        type: Ossia.Float,
+                        unit: "color.rgb"
+                    },
+\end{lstlisting}
 \end{frame}
 
 \subsection{Interoperability}
 
 \begin{frame}[fragile]
-\frametitle{ossia : C++}
+\frametitle{libossia (C++14)}
+Linux, macOS, Windows, GCC, Clang, MSVC, static, dynamic\dots
+~\\
+Only header-only dependencies.
 
-C++14, Linux, macOS, Windows, GCC, Clang, MSVC, static, dynamic, etc.
 ~\\
 \footnotesize
 \begin{lstlisting}[language=C++]
@@ -104,10 +157,10 @@ node.set(bounding_mode_attribute{}, bounding_mode::FOLD);
 node.set(domain_attribute{}, make_domain(2, 14));
 node.set(description_attribute{}, "an integral value");
 
-address->add_callback([] (const auto& val) { 
-    std::cout << val << " "; 
+address->add_callback([] (const auto& val) {
+    std::cout << val << " ";
   });
-  
+
 address->push_value(5678);
 \end{lstlisting}
 \end{frame}
@@ -137,6 +190,7 @@ _position.setup(_sizeParams,
 \begin{frame}
 \frametitle{ossia-pd (and ossia-max soon)}
 \Large
+\includegraphics[width=\textwidth]{images/ossiapd.png}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -148,8 +202,8 @@ tuple_node = local_device.add_node("/test/value/tuple")
 tuple_address = tuple_node.create_address(
                     ossia.ValueType.Tuple)
 tuple_value = ossia.Value([
-    ossia.Value(44100), 
-    ossia.Value("test.wav"), 
+    ossia.Value(44100),
+    ossia.Value("test.wav"),
     ossia.Value(0.9)]
     )
 tuple_address.push_value(tuple_value)
@@ -166,7 +220,7 @@ def bool_value_callback(v):
 \Large
 \footnotesize
 \begin{lstlisting}[language=python]
-public class Foo : public MonoBehaviour 
+public class Foo : public MonoBehaviour
 {
   [Ossia.Attribute]
   int foo;
@@ -178,7 +232,7 @@ public class Foo : public MonoBehaviour
 \frametitle{ossia-qml (Qt QML)}
 \small
 \begin{lstlisting}
-Item { 
+Item {
   Ossia.Node { name: 'test' }
   AngleSlider {
     // Reads and writes from /test/angle
@@ -333,10 +387,10 @@ ossia_node_t ossia_node_add_child(
 \frametitle{Working with external devices}
 \Large
 \begin{itemize}
-    \item<1> Automatic discovery
+    \item<1> Manual entry
     \item<2> Loading
-    \item<3> Manual entry
-    \item<4> Introspection
+    \item<3> Learning
+    \item<4> Automatic discovery
 \end{itemize}
 \end{frame}
 
@@ -349,19 +403,18 @@ ossia_node_t ossia_node_add_child(
 
 \section{Audio features}
 \begin{frame}
-\frametitle{Audio: sounds, live input}
+\frametitle{Audio}
 \Large
-Hierarchical mixing.
+Hierarchical mixing, sounds, effects (Faust, LV2), sends...
+\begin{figure}
+\includegraphics[width=0.8\textwidth]{images/audio.png}
+\end{figure}
 \end{frame}
 
 \begin{frame}
-\frametitle{Audio: applying effects}
 \Large
-\end{frame}
-
-\begin{frame}
-\frametitle{Audio: send, returns}
-\Large
+\centering
+The whole audio sequencing part is implemented with the plug-in API.
 \end{frame}
 
 \section{Conclusion}
@@ -383,9 +436,8 @@ Hierarchical mixing.
 \begin{itemize}
     \item<1> Embedded score player.
     \item<2> Network operation.
-    \item<3> Plug-in API.
-    \item<4> Full-fledged audiograph.
-    \item<5> Ongoing work on UI.
+    \item<3> Full-fledged audiograph.
+    \item<4> Ongoing work on UI.
 \end{itemize}
 \end{frame}
 
@@ -393,9 +445,11 @@ Hierarchical mixing.
 
 \begin{frame}
 \frametitle{Workshop}
+\Large
 \begin{itemize}
-    \item Building scores
-    \item Experimenting with your favorite environments
+    \item Building scores.
+    \item Experimenting with your favorite environments.
+    \item Gather your remarks and advices !
 \end{itemize}
 \end{frame}
 
