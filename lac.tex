@@ -2,11 +2,48 @@
 \usepackage{fontspec}
 \usetheme{simple}
 \setbeamertemplate{footline}{}
-% \usepackage{polyglossia}
+\usepackage{polyglossia}
+\usepackage{microtype}
 \usepackage{listings}
-%\setmainfont{Noto Sans}
-%\setsansfont{Noto Sans}
+\setmainfont{Tribun ADF Std}
+\setsansfont{Tribun ADF Std}
 \setmonofont{Fira Code}
+
+\usepackage{xcolor}
+
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+
+\lstdefinelanguage{json}{
+    basicstyle=\normalfont\ttfamily\scriptsize,
+    numberstyle=\footnotesize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{background},
+    literate=
+    *{0}{{{\color{numb}0}}}{1}
+    {1}{{{\color{numb}1}}}{1}
+    {2}{{{\color{numb}2}}}{1}
+    {3}{{{\color{numb}3}}}{1}
+    {4}{{{\color{numb}4}}}{1}
+    {5}{{{\color{numb}5}}}{1}
+    {6}{{{\color{numb}6}}}{1}
+    {7}{{{\color{numb}7}}}{1}
+    {8}{{{\color{numb}8}}}{1}
+    {9}{{{\color{numb}9}}}{1}
+    {:}{{{\color{punct}{:}}}}{1}
+    {,}{{{\color{punct}{,}}}}{1}
+    {\{}{{{\color{delim}{\{}}}}{1}
+    {\}}{{{\color{delim}{\}}}}}{1}
+    {[}{{{\color{delim}{[}}}}{1}
+    {]}{{{\color{delim}{]}}}}{1},
+}
+
 \author{Jean-Michaël Celerier}
 \title{i-score: an overview}
 \subtitle{Linux Audio Conference - Workshop}
@@ -113,7 +150,7 @@ To come: ArtNet (DMX)
 \Large
 When no tree structure easily makes sense,~\\let the user script it !
 \footnotesize
-\begin{lstlisting}
+\begin{lstlisting}[language=json]
 function onMessage(message) {
     console.log(message);
     var res = JSON.parse(message);
@@ -148,7 +185,7 @@ Only header-only dependencies.
 
 ~\\
 \footnotesize
-\begin{lstlisting}[language=C++]
+\begin{lstlisting}[language=json]
 auto& node = find_or_create_node(device, "/test/my_int");
 auto address = node.create_address(val_type::INT);
 
@@ -170,7 +207,7 @@ address->push_value(5678);
 \Large Integration with ofParameter, ofParameterGroup
 ~\\
 \footnotesize
-\begin{lstlisting}[language=C++]
+\begin{lstlisting}[language=json]
 ossia::Parameter<bool> _fill;
 ossia::Parameter<ofColor> _color;
 ossia::ParameterGroup _sizeParams;
@@ -196,7 +233,7 @@ _position.setup(_sizeParams,
 \begin{frame}[fragile]
 \frametitle{ossia-python}
 \footnotesize
-\begin{lstlisting}[language=python]
+\begin{lstlisting}[language=json]
 # create a node, create a tuple address and initialize it
 tuple_node = local_device.add_node("/test/value/tuple")
 tuple_address = tuple_node.create_address(
@@ -219,7 +256,7 @@ def bool_value_callback(v):
 \frametitle{ossia-unity3D (C\#)}
 \Large
 \footnotesize
-\begin{lstlisting}[language=python]
+\begin{lstlisting}[language=json]
 public class Foo : public MonoBehaviour
 {
   [Ossia.Attribute]
@@ -231,7 +268,7 @@ public class Foo : public MonoBehaviour
 \begin{frame}[fragile]
 \frametitle{ossia-qml (Qt QML)}
 \small
-\begin{lstlisting}
+\begin{lstlisting}[language=json]
 Item {
   Ossia.Node { name: 'test' }
   AngleSlider {
@@ -251,7 +288,7 @@ Item {
 \begin{frame}[fragile]
 \frametitle{ossia-C (C99)}
 \small
-\begin{lstlisting}[language=C]
+\begin{lstlisting}[language=json]
 OSSIA_EXPORT
 bool ossia_device_update_namespace(
          ossia_device_t device);
@@ -434,10 +471,11 @@ The whole audio sequencing part is implemented with the plug-in API.
 \frametitle{Work-in-progress}
 \Large
 \begin{itemize}
-    \item<1> Embedded score player.
-    \item<2> Network operation.
+    \item<1> Embedded score player: put your score in an Android app, a Pd patch, \dots
+    \item<2> Network edition, execution and control, of both editors and players. 
     \item<3> Full-fledged audiograph.
     \item<4> Ongoing work on UI.
+    \item<5> Need to test live edition more.
 \end{itemize}
 \end{frame}
 
